@@ -1,0 +1,3 @@
+I001|Cotton Fabric|Fabric|1000|meters
+I002|Red Thread|Thread|500|spools
+I003|Buttons|Accessories|2000|units

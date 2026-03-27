@@ -1,70 +1,107 @@
-#pragma once
-
 #include "Garment.cpp"
-#include "Machine.cpp"
-#include "Employee.cpp"
-#include "DataTypes.cpp" // Reuse status enum
+#include <bits/stdc++.h>
+using namespace std;
 
-namespace GarmentFactory {
-
-class ProductionOrder {
+class ProductionOrder
+{
 private:
-    std::string orderId;
+    string orderId;
     Garment garment;
     int quantity;
-    std::string orderDate; // String for simplicity
-    std::string deadline;
-    OrderStatus status;
-    std::string priority; // "High", "Normal"
-    
-    // assignments
-    std::string assignedMachineId;
-    std::string assignedOperatorId;
+    string orderDate;
+    string deadline;
+    string status;
+    string priority;
 
-    std::vector<std::string> productionSteps;
-    
-    float progress; // 0.0 - 1.0 (Simulation aspect)
+    string assignedMachineId;
+    string assignedOperatorId;
+
+    vector<string> productionSteps;
+    float progress;
 
 public:
-    ProductionOrder() {}
-    ProductionOrder(std::string id, Garment g, int qty, std::string dline)
-        : orderId(id), garment(g), quantity(qty), deadline(dline), 
-          status(OrderStatus::PENDING), priority("Normal"), progress(0.0f) {
-              orderDate = DateTime::now().toString();
-          }
+    ProductionOrder() { progress = 0.0; }
 
-    // UML Methods
-    void createOrder() { status = OrderStatus::PENDING; }
-    
+    ProductionOrder(string id, Garment g, int qty, string dline)
+    {
+        orderId = id;
+        garment = g;
+        quantity = qty;
+        deadline = dline;
+        status = "Pending";
+        priority = "Normal";
+        progress = 0.0;
+        // set order date to current time
+        time_t now = time(0);
+        orderDate = string(ctime(&now));
+        // clean trailing newline from ctime
+        if (!orderDate.empty() && orderDate.back() == '\n') orderDate.pop_back();
+    }
+
+    // Constructor for loading from file
+    ProductionOrder(string id, Garment g, int qty, string dline, string stat, string prio, float prog, string oDate)
+    {
+        orderId = id;
+        garment = g;
+        quantity = qty;
+        deadline = dline;
+        status = stat;
+        priority = prio;
+        progress = prog;
+        orderDate = oDate;
+    }
+
+    void createOrder() { status = "Pending"; }
+
     bool validateOrder() { return quantity > 0; }
-    
-    void updateStatus(OrderStatus newStatus) { status = newStatus; }
-    
-    void assignResources(std::string machineId, std::string empId) {
+
+    void updateStatus(string newStatus) { status = newStatus; }
+
+    void assignResources(string machineId, string empId)
+    {
         assignedMachineId = machineId;
         assignedOperatorId = empId;
-        status = OrderStatus::IN_PROGRESS;
-    }
-    
-    // Simulation
-    bool updateProgress(float dt) {
-        if(status == OrderStatus::IN_PROGRESS) {
-            progress += dt * 0.1f; // Arbitrary speed
-            if(progress >= 1.0f) {
-                progress = 1.0f;
-                return true;
-            }
-        }
-        return false;
+        status = "In Progress";
     }
 
-    // Getters
-    std::string getId() const { return orderId; }
+    void advanceStatus()
+    {
+        if (status == "Pending")
+        {
+            status = "Cutting";
+            progress = 0.25f;
+        }
+        else if (status == "Cutting")
+        {
+            status = "Sewing";
+            progress = 0.50f;
+        }
+        else if (status == "Sewing")
+        {
+            status = "QC";
+            progress = 0.75f;
+        }
+        else if (status == "QC")
+        {
+            status = "Completed";
+            progress = 1.0f;
+        }
+        else
+        {
+            status = "Pending";
+            progress = 0.0f;
+        }
+    }
+
+    // getters
+    string getId() const { return orderId; }
     Garment getGarment() const { return garment; }
     int getQuantity() const { return quantity; }
-    OrderStatus getStatus() const { return status; }
+    string getStatus() const { return status; }
     float getProgress() const { return progress; }
-    std::string getOperatorId() const { return assignedOperatorId; }
+    string getOperatorId() const { return assignedOperatorId; }
+    string getMachineId() const { return assignedMachineId; }
+    string getDeadline() const { return deadline; }
+    string getPriority() const { return priority; }
+    string getOrderDate() const { return orderDate; }
 };
-
-} // namespace GarmentFactory
