@@ -1,16 +1,6 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-struct ShiftSchedule
-{
-    string shiftId;
-    string shiftType;
-    string startTime;
-    string endTime;
-    string date;
-    vector<string> assignedEmployees;
-};
-
 // Abstract Class & Inheritance
 class Person {
 protected:
@@ -33,11 +23,7 @@ class Employee : public Person
 private:
     string department;
     string designation;
-    string contact;
-    string joiningDate;
     string employmentStatus;
-    vector<string> skills;
-    string currentShiftId;
     int currentLoad;
 
 public:
@@ -51,26 +37,9 @@ public:
         currentLoad = 0;
     }
 
-    void updateProfile(string newContact) { contact = newContact; }
-    void addSkill(string skill) { skills.push_back(skill); }
-
-    bool isAvailable() const { return employmentStatus == "Active" && currentLoad < 100; }
-
-    void assignTask()
-    {
-        currentLoad += 20;
-        if (currentLoad > 100) currentLoad = 100;
-    }
-
-    void completeTask()
-    {
-        currentLoad -= 20;
-        if (currentLoad < 0) currentLoad = 0;
-    }
-
     // Polymorphism: overriding the pure virtual function
     string getRole() const override { return designation; }
-    
+
     string getDepartment() const { return department; }
     int getLoad() const { return currentLoad; }
 };

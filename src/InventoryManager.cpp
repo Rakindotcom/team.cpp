@@ -19,10 +19,7 @@ private:
     string itemName;
     string category;
     double currentStock;
-    double reorderLevel;
     string unit;
-    double unitPrice;
-    string lastUpdated;
 
 public:
     InventoryItem(string id, string name, string cat, double stock, string u)
@@ -32,8 +29,6 @@ public:
         category = cat;
         currentStock = stock;
         unit = u;
-        reorderLevel = 50.0;
-        unitPrice = 0.0;
     }
 
     void updateStock(double qty) { currentStock += qty; }
@@ -41,16 +36,6 @@ public:
     // Operator Overloading
     void operator+=(double qty) {
         currentStock += qty;
-    }
-
-    bool checkAvailability(double qty) const { return currentStock >= qty; }
-
-    void generateReorderAlert()
-    {
-        if (currentStock < reorderLevel)
-        {
-            // alert system
-        }
     }
 
     string getName() const { return itemName; }
@@ -110,41 +95,6 @@ public:
         loadInventory();
     }
 
-    void trackInventory()
-    {
-        // periodic check
-    }
-
-    string generateStockReport()
-    {
-        string report = "Stock Alert:\n";
-        for (int i = 0; i < allItems.size(); i++)
-        {
-            if (allItems[i].getStock() < 50)
-                report += "- Low Stock: " + allItems[i].getName() + "\n";
-        }
-        return report;
-    }
-
-    void processReorder()
-    {
-        for (int i = 0; i < allItems.size(); i++)
-        {
-            if (allItems[i].getStock() < 100)
-                allItems[i] += 500; // Using operator overloading
-        }
-        saveInventory();
-    }
-
-    InventoryItem* findItem(string id)
-    {
-        for (int i = 0; i < allItems.size(); i++)
-        {
-            if (allItems[i].getId() == id) return &allItems[i];
-        }
-        return nullptr;
-    }
-
     void addItem(InventoryItem item)
     {
         allItems.push_back(item);
@@ -154,7 +104,7 @@ public:
     void removeItem(string id)
     {
         int oldSize = allItems.size();
-        removeEntityById(allItems, id); // Using Template
+        removeEntityById(allItems, id);
         if (allItems.size() < oldSize) saveInventory();
     }
 
