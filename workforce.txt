@@ -1,0 +1,4 @@
+E001|Rakin|Production|Operator
+E002|Abdullah|Production|Operator
+E003|Abdiqani|Maintenance|Technician
+E004|Abdiladiif|Maintenance|Technician

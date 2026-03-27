@@ -1,90 +1,162 @@
-#pragma once
-#include <string>
-#include <vector>
+#include <bits/stdc++.h>
+using namespace std;
 
-namespace GarmentFactory {
-
-struct SKUVariant {
-    std::string sku;
-    std::string color;
-    std::string size;
-    std::string materialGrade;
-    std::string batchNumber;
-    std::string expiryDate;
-
-    std::string generateSKU() { return batchNumber + "-" + color + "-" + size; }
-    bool validateBatch() { return !batchNumber.empty(); }
-};
-
-class InventoryItem {
-private:
-    std::string itemId;
-    std::string itemName;
-    std::string category; // "Fabric", "Thread"
-    double currentStock;
-    double reorderLevel;
-    std::string unit;
-    double unitPrice;
-    std::string lastUpdated;
-    
-    std::vector<SKUVariant> variants;
-
-public:
-    InventoryItem(std::string id, std::string name, std::string cat, double stock, std::string u)
-        : itemId(id), itemName(name), category(cat), currentStock(stock), unit(u), reorderLevel(50.0) {}
-
-    void updateStock(double qty) { currentStock += qty; }
-    
-    bool checkAvailability(double qty) const { return currentStock >= qty; }
-    
-    void generateReorderAlert() {
-        if(currentStock < reorderLevel) {
-            // Logic to alert System
+// Template definition
+template <typename T>
+void removeEntityById(vector<T>& vec, string id) {
+    for (auto it = vec.begin(); it != vec.end(); ++it) {
+        if (it->getId() == id) {
+            vec.erase(it);
+            break;
         }
     }
-    
-    // Getters
-    std::string getName() const { return itemName; }
-    double getStock() const { return currentStock; }
-    std::string getId() const { return itemId; }
-};
+}
 
-class InventoryManager {
+class InventoryItem
+{
 private:
-    std::vector<InventoryItem> allItems;
+    string itemId;
+    string itemName;
+    string category;
+    double currentStock;
+    double reorderLevel;
+    string unit;
+    double unitPrice;
+    string lastUpdated;
 
 public:
-    InventoryManager() {
-        // Seeds
-        allItems.emplace_back("I001", "Cotton Fabric", "Fabric", 1000.0, "meters");
-        allItems.emplace_back("I002", "Red Thread", "Thread", 500.0, "spools");
-        allItems.emplace_back("I003", "Buttons", "Accessories", 2000.0, "pcs");
+    InventoryItem(string id, string name, string cat, double stock, string u)
+    {
+        itemId = id;
+        itemName = name;
+        category = cat;
+        currentStock = stock;
+        unit = u;
+        reorderLevel = 50.0;
+        unitPrice = 0.0;
     }
 
-    void trackInventory() {
-        // Periodic check
+    void updateStock(double qty) { currentStock += qty; }
+
+    // Operator Overloading
+    void operator+=(double qty) {
+        currentStock += qty;
     }
 
-    std::string generateStockReport() {
-        std::string report = "Stock Alert:\n";
-        for(const auto& item : allItems) {
-            if(item.getStock() < 50) report += "- Low Stock: " + item.getName() + "\n";
+    bool checkAvailability(double qty) const { return currentStock >= qty; }
+
+    void generateReorderAlert()
+    {
+        if (currentStock < reorderLevel)
+        {
+            // alert system
+        }
+    }
+
+    string getName() const { return itemName; }
+    double getStock() const { return currentStock; }
+    string getId() const { return itemId; }
+    string getCategory() const { return category; }
+    string getUnit() const { return unit; }
+};
+
+class InventoryManager
+{
+private:
+    vector<InventoryItem> allItems;
+
+    void loadInventory()
+    {
+        ifstream file("inventory.txt");
+        if (!file.is_open()) return;
+
+        string line;
+        while (getline(file, line)) {
+            if (line.empty()) continue;
+            stringstream ss(line);
+            string id, name, cat, stockStr, unit;
+            getline(ss, id, '|');
+            getline(ss, name, '|');
+            getline(ss, cat, '|');
+            getline(ss, stockStr, '|');
+            getline(ss, unit, '|');
+
+            try {
+                double stock = stod(stockStr);
+                allItems.push_back(InventoryItem(id, name, cat, stock, unit));
+            } catch (...) {}
+        }
+        file.close();
+    }
+
+    void saveInventory()
+    {
+        ofstream file("inventory.txt");
+        if (!file.is_open()) return;
+
+        for (int i = 0; i < allItems.size(); i++) {
+            file << allItems[i].getId() << "|"
+                 << allItems[i].getName() << "|"
+                 << allItems[i].getCategory() << "|"
+                 << allItems[i].getStock() << "|"
+                 << allItems[i].getUnit() << "\n";
+        }
+        file.close();
+    }
+
+public:
+    InventoryManager()
+    {
+        loadInventory();
+    }
+
+    void trackInventory()
+    {
+        // periodic check
+    }
+
+    string generateStockReport()
+    {
+        string report = "Stock Alert:\n";
+        for (int i = 0; i < allItems.size(); i++)
+        {
+            if (allItems[i].getStock() < 50)
+                report += "- Low Stock: " + allItems[i].getName() + "\n";
         }
         return report;
     }
 
-    void processReorder() {
-        for(auto& item : allItems) {
-            if(item.getStock() < 100) item.updateStock(500); // Auto reorder sim
+    void processReorder()
+    {
+        for (int i = 0; i < allItems.size(); i++)
+        {
+            if (allItems[i].getStock() < 100)
+                allItems[i] += 500; // Using operator overloading
         }
+        saveInventory();
     }
 
-    InventoryItem* findItem(std::string id) {
-        for(auto& i : allItems) if(i.getId() == id) return &i;
+    InventoryItem* findItem(string id)
+    {
+        for (int i = 0; i < allItems.size(); i++)
+        {
+            if (allItems[i].getId() == id) return &allItems[i];
+        }
         return nullptr;
     }
-    
-    std::vector<InventoryItem>& getItems() { return allItems; }
-};
 
-} // namespace GarmentFactory
+    void addItem(InventoryItem item)
+    {
+        allItems.push_back(item);
+        saveInventory();
+    }
+
+    void removeItem(string id)
+    {
+        int oldSize = allItems.size();
+        removeEntityById(allItems, id); // Using Template
+        if (allItems.size() < oldSize) saveInventory();
+    }
+
+    vector<InventoryItem>& getItems() { return allItems; }
+};

@@ -1,58 +1,67 @@
-#pragma once
-#include <string>
-#include <vector>
-#include <map>
+#include <bits/stdc++.h>
+using namespace std;
 
-namespace GarmentFactory {
-
-class PatternPiece {
+class PatternPiece
+{
 private:
-    std::string pieceId;
-    std::string pieceName; // "Sleeve", "Collar"
-    std::string garmentType;
+    string pieceId;
+    string pieceName;
+    string garmentType;
     double length;
     double width;
-    std::string fabricType;
+    string fabricType;
 
 public:
-    PatternPiece(std::string name, double l, double w, std::string fabric)
+    PatternPiece(string name, double l, double w, string fabric)
         : pieceName(name), length(l), width(w), fabricType(fabric) {}
 
     double calculateArea() const { return length * width; }
     bool validateDimensions() const { return length > 0 && width > 0; }
 };
 
-class Garment {
+class Garment
+{
 private:
-    std::string garmentId;
-    std::string garmentType; // "Shirt", "Trousers"
-    std::string sizeRange;   // "S-XL"
-    std::string fabricType;
+    string garmentId;
+    string garmentType;
+    string sizeRange;
+    string fabricType;
     double baseFabricRequirement;
-    std::vector<PatternPiece> contains;
+    vector<PatternPiece> contains;
 
 public:
     Garment() {}
-    Garment(std::string id, std::string type, std::string size, std::string fabric, double baseReq)
-        : garmentId(id), garmentType(type), sizeRange(size), fabricType(fabric), baseFabricRequirement(baseReq) {}
 
-    void addPatternPiece(const PatternPiece& piece) {
+    Garment(string id, string type, string size, string fabric, double baseReq)
+    {
+        garmentId = id;
+        garmentType = type;
+        sizeRange = size;
+        fabricType = fabric;
+        baseFabricRequirement = baseReq;
+    }
+
+    void addPatternPiece(PatternPiece piece)
+    {
         contains.push_back(piece);
     }
 
-    // Returns generic Map<MaterialName, Quantity>
-    std::map<std::string, double> calculateMaterial() const {
-        std::map<std::string, double> mats;
+    map<string, double> calculateMaterial() const
+    {
+        map<string, double> mats;
         mats[fabricType] = baseFabricRequirement;
         return mats;
     }
 
-    double estimateCost() const {
-        // Simplified
-        return baseFabricRequirement * 10.0; 
+    double estimateCost() const
+    {
+        return baseFabricRequirement * 10.0;
     }
-    
-    std::string getName() const { return garmentType + " (" + sizeRange + ")"; }
-};
 
-} // namespace GarmentFactory
+    string getName() const { return garmentType + " (" + sizeRange + ")"; }
+    string getId() const { return garmentId; }
+    string getType() const { return garmentType; }
+    string getSize() const { return sizeRange; }
+    string getFabric() const { return fabricType; }
+    double getBaseReq() const { return baseFabricRequirement; }
+};

@@ -1,58 +1,76 @@
-#pragma once
+#include <bits/stdc++.h>
+using namespace std;
 
-#include <string>
-#include <vector>
-#include <iomanip>
-#include <sstream>
-
-namespace GarmentFactory {
-
-struct ShiftSchedule {
-    std::string shiftId;
-    std::string shiftType; // "Morning", "Evening"
-    std::string startTime;
-    std::string endTime;
-    std::string date;
-    
-    // In a full DB these would be IDs, keeping strings for MVP
-    std::vector<std::string> assignedEmployees; 
+struct ShiftSchedule
+{
+    string shiftId;
+    string shiftType;
+    string startTime;
+    string endTime;
+    string date;
+    vector<string> assignedEmployees;
 };
 
-class Employee {
+// Abstract Class & Inheritance
+class Person {
+protected:
+    string personId;
+    string name;
+public:
+    Person() {}
+    Person(string i, string n) : personId(i), name(n) {}
+    virtual ~Person() {}
+
+    // Pure virtual function -> Abstract Class
+    virtual string getRole() const = 0;
+
+    string getId() const { return personId; }
+    string getName() const { return name; }
+};
+
+class Employee : public Person
+{
 private:
-    std::string employeeId;
-    std::string name;
-    std::string department; // "Production", "Quality", "HR"
-    std::string designation; // "Operator", "Supervisor"
-    std::string contact;
-    std::string joiningDate;
-    std::string employmentStatus; // "Active", "OnLeave"
-    
-    std::vector<std::string> skills;
-    // Current Schedule context
-    std::string currentShiftId; 
-    int currentLoad; // 0-100%
+    string department;
+    string designation;
+    string contact;
+    string joiningDate;
+    string employmentStatus;
+    vector<string> skills;
+    string currentShiftId;
+    int currentLoad;
 
 public:
-    Employee() {}
-    Employee(std::string id, std::string n, std::string dept, std::string desig)
-        : employeeId(id), name(n), department(dept), designation(desig), employmentStatus("Active"), currentLoad(0) {}
+    Employee() : Person() { currentLoad = 0; }
 
-    void updateProfile(std::string newContact) { contact = newContact; }
-    
-    void addSkill(std::string skill) { skills.push_back(skill); }
+    Employee(string id, string n, string dept, string desig) : Person(id, n)
+    {
+        department = dept;
+        designation = desig;
+        employmentStatus = "Active";
+        currentLoad = 0;
+    }
 
-    // Logic from previous 'Worker' class adapted
+    void updateProfile(string newContact) { contact = newContact; }
+    void addSkill(string skill) { skills.push_back(skill); }
+
     bool isAvailable() const { return employmentStatus == "Active" && currentLoad < 100; }
-    
-    void assignTask() { currentLoad += 20; if(currentLoad > 100) currentLoad = 100; }
-    void completeTask() { currentLoad -= 20; if(currentLoad < 0) currentLoad = 0; }
 
-    std::string getId() const { return employeeId; }
-    std::string getName() const { return name; }
-    std::string getRole() const { return designation; }
-    std::string getDepartment() const { return department; }
+    void assignTask()
+    {
+        currentLoad += 20;
+        if (currentLoad > 100) currentLoad = 100;
+    }
+
+    void completeTask()
+    {
+        currentLoad -= 20;
+        if (currentLoad < 0) currentLoad = 0;
+    }
+
+    // Polymorphism: overriding the pure virtual function
+    string getRole() const override { return designation; }
+    
+    string getDepartment() const { return department; }
     int getLoad() const { return currentLoad; }
 };
-
-} // namespace GarmentFactory
