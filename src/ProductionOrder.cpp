@@ -12,11 +12,6 @@ private:
     string deadline;
     string status;
     string priority;
-
-    string assignedMachineId;
-    string assignedOperatorId;
-
-    vector<string> productionSteps;
     float progress;
 
 public:
@@ -31,10 +26,8 @@ public:
         status = "Pending";
         priority = "Normal";
         progress = 0.0;
-        // set order date to current time
         time_t now = time(0);
         orderDate = string(ctime(&now));
-        // clean trailing newline from ctime
         if (!orderDate.empty() && orderDate.back() == '\n') orderDate.pop_back();
     }
 
@@ -49,19 +42,6 @@ public:
         priority = prio;
         progress = prog;
         orderDate = oDate;
-    }
-
-    void createOrder() { status = "Pending"; }
-
-    bool validateOrder() { return quantity > 0; }
-
-    void updateStatus(string newStatus) { status = newStatus; }
-
-    void assignResources(string machineId, string empId)
-    {
-        assignedMachineId = machineId;
-        assignedOperatorId = empId;
-        status = "In Progress";
     }
 
     void advanceStatus()
@@ -99,8 +79,6 @@ public:
     int getQuantity() const { return quantity; }
     string getStatus() const { return status; }
     float getProgress() const { return progress; }
-    string getOperatorId() const { return assignedOperatorId; }
-    string getMachineId() const { return assignedMachineId; }
     string getDeadline() const { return deadline; }
     string getPriority() const { return priority; }
     string getOrderDate() const { return orderDate; }

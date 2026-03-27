@@ -6,7 +6,6 @@ class HRManager
 {
 private:
     vector<Employee> employees;
-    vector<ShiftSchedule> schedules;
 
     void loadWorkforce()
     {
@@ -48,31 +47,7 @@ public:
         loadWorkforce();
     }
 
-    void manageShifts()
-    {
-        // auto-assign logic could go here
-    }
-
-    string generateWorkforceReport()
-    {
-        int active = 0;
-        for (int i = 0; i < employees.size(); i++)
-        {
-            if (employees[i].getLoad() > 0) active++;
-        }
-        return "Workforce: " + to_string(active) + " active out of " + to_string(employees.size());
-    }
-
     vector<Employee>& getEmployees() { return employees; }
-
-    Employee* findEmployee(string id)
-    {
-        for (int i = 0; i < employees.size(); i++)
-        {
-            if (employees[i].getId() == id) return &employees[i];
-        }
-        return nullptr;
-    }
 
     void addEmployee(Employee e)
     {
@@ -83,7 +58,7 @@ public:
     void removeEmployee(string id)
     {
         int oldSize = employees.size();
-        removeEntityById(employees, id); // Using template
+        removeEntityById(employees, id);
         if (employees.size() < oldSize) saveWorkforce();
     }
 };

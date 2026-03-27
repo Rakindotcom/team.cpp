@@ -1,8 +1,6 @@
 #include "ProductionOrder.cpp"
 #include "InventoryManager.cpp"
 #include "HRManager.cpp"
-#include "Machine.cpp"
-#include "QualityManager.cpp"
 #include <bits/stdc++.h>
 using namespace std;
 
@@ -10,7 +8,6 @@ class OrderManager
 {
 private:
     vector<ProductionOrder> activeOrders;
-    vector<Machine> machines;
 
     InventoryManager* invMgr;
     HRManager* hrMgr;
@@ -74,46 +71,19 @@ public:
         }
         file.close();
     }
+
     OrderManager(InventoryManager* i, HRManager* h)
     {
         invMgr = i;
         hrMgr = h;
-
-        // seed some machines (keeping machines hardcoded for now as per instructions, only orders/inv/hr to text files)
-        machines.push_back(Machine("MAC-01", "Sewing", "Brother S-7000", 100));
-        machines.push_back(Machine("MAC-02", "Sewing", "Juki DDL-8700", 120));
-        machines.push_back(Machine("CUT-01", "Cutting", "Eastman 629", 500));
-
         loadOrders();
     }
 
     void scheduleOrder(Garment garment, int quantity)
     {
-        // check inventory
-        if (invMgr->getItems().size() > 0)
-        {
-            // deduct logic would go here
-        }
-
         string id = "PO-" + to_string(activeOrders.size() + 1);
         ProductionOrder po(id, garment, quantity, "2025-12-31");
-        po.createOrder();
         activeOrders.push_back(po);
-        saveOrders();
-    }
-
-    void assignResources()
-    {
-        for (int i = 0; i < activeOrders.size(); i++)
-        {
-            if (activeOrders[i].getStatus() == "Pending")
-            {
-                // get first available machine and employee
-                string mid = machines[0].getId();
-                string eid = hrMgr->getEmployees()[0].getId();
-                activeOrders[i].assignResources(mid, eid);
-            }
-        }
         saveOrders();
     }
 
@@ -124,22 +94,5 @@ public:
         }
     }
 
-
-
-    string generateProductionReport()
-    {
-        string report = "=== Production Report ===\n";
-        report += "Active Orders: " + to_string(activeOrders.size()) + "\n";
-        int completed = 0;
-        for (int i = 0; i < activeOrders.size(); i++)
-        {
-            if (activeOrders[i].getStatus() == "Completed") completed++;
-        }
-        report += "Completed (Session): " + to_string(completed) + "\n";
-        report += "Machines Operational: " + to_string(machines.size()) + "\n";
-        return report;
-    }
-
     vector<ProductionOrder>& getOrders() { return activeOrders; }
-    vector<Machine>& getMachines() { return machines; }
 };
